@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final bool isPass;
 
   const CustomTextField({
+    super.key,
     required this.controller,
     required this.label,
     this.isPass = false,

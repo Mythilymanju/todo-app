@@ -9,12 +9,25 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final AppRouter _router = AppRouter();
+
+  MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
-      onGenerateRoute: AppRoutes.generateRoute,
+      routerDelegate: _router,
+      routeInformationParser: _SimpleParser(),
     );
+  }
+}
+
+class _SimpleParser extends RouteInformationParser<String> {
+  @override
+  Future<String> parseRouteInformation(
+    RouteInformation routeInformation,
+  ) async {
+    return routeInformation.location ?? AppRoutes.login;
   }
 }

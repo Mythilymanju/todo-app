@@ -24,7 +24,7 @@ class AuthService {
       });
     } catch (e) {
       throw Exception(e.toString());
-    };
+    }
   }
 
   Future<void> login(String email, String password) async {

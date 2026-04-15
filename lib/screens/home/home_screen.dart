@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/firestore_service.dart';
 import '../../widgets/task_card.dart';
+import '../../widgets/app_scaffold.dart';
+import '../../routes/app_routes.dart';
 import '../tasks/add_edit_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,19 +16,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("My Tasks"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              await AuthService().logout();
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
+    return AppScaffold(
+      title: "My Tasks",
+
+      actions: [
+        IconButton(
+          icon: Icon(Icons.logout),
+          onPressed: () async {
+            await AuthService().logout();
+
+            final router = Router.of(context).routerDelegate as AppRouter;
+            router.goTo(AppRoutes.login);
+          },
+        ),
+      ],
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -36,10 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Icon(Icons.add),
       ),
+
       body: Column(
         children: [
-          DropdownButton(
+          DropdownButton<String>(
             value: filter,
+            isExpanded: true,
             items: [
               'all',
               'pending',
@@ -48,20 +54,28 @@ class _HomeScreenState extends State<HomeScreen> {
             ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: (val) {
               setState(() {
-                filter = val.toString();
+                filter = val!;
               });
             },
           ),
+
           Expanded(
             child: StreamBuilder(
               stream: FirestoreService().getTasks(filter),
               builder: (context, snapshot) {
-                if (!snapshot.hasData)
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
+                }
 
-                var tasks = snapshot.data!.docs;
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return Center(child: Text("No tasks"));
+                }
 
-                if (tasks.isEmpty) return Center(child: Text("No tasks"));
+                final tasks = snapshot.data!.docs;
+
+                if (tasks.isEmpty) {
+                  return Center(child: Text("No tasks"));
+                }
 
                 return ListView.builder(
                   itemCount: tasks.length,

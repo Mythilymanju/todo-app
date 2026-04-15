@@ -1,39 +1,29 @@
 import 'package:flutter/material.dart';
-import '../core/services/firestore_service.dart';
 import '../screens/tasks/add_edit_task_screen.dart';
-import 'status_dropdown.dart';
+import '../core/services/firestore_service.dart';
 
 class TaskCard extends StatelessWidget {
   final dynamic task;
 
-  TaskCard({required this.task});
+  const TaskCard({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
+    final data = task.data(); 
+
     return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
-        title: Text(task['title']),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(task['description']),
-            StatusDropdown(id: task.id, status: task['status']),
-          ],
-        ),
-        leading: Checkbox(
-          value: task['status'] == 'completed',
-          onChanged: (val) {
-            FirestoreService().updateStatus(
-              task.id,
-              val! ? 'completed' : 'pending',
-            );
-          },
-        ),
+        title: Text(data['title'] ?? ''),
+        subtitle: Text(data['description'] ?? ''),
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+
+          
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: const Icon(Icons.edit),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -43,10 +33,12 @@ class TaskCard extends StatelessWidget {
                 );
               },
             ),
+
+           
             IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                FirestoreService().deleteTask(task.id);
+              icon: const Icon(Icons.delete),
+              onPressed: () async {
+                await FirestoreService().deleteTask(task.id);
               },
             ),
           ],

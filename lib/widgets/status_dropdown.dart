@@ -5,7 +5,7 @@ class StatusDropdown extends StatelessWidget {
   final String id;
   final String status;
 
-  StatusDropdown({required this.id, required this.status});
+  const StatusDropdown({super.key, required this.id, required this.status});
 
   @override
   Widget build(BuildContext context) {

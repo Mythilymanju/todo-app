@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import '../../utils/helpers.dart';
 import '../../widgets/custom_textfield.dart';
-import '../home/home_screen.dart';
-import 'register_screen.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/app_scaffold.dart';
+import '../../routes/app_routes.dart';
 
 class LoginScreen extends StatelessWidget {
   final email = TextEditingController();
@@ -11,42 +12,41 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Login")),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            CustomTextField(controller: email, label: "Email"),
-            SizedBox(height: 10),
-            CustomTextField(controller: pass, label: "Password", isPass: true),
+    return AppScaffold(
+      title: "Login",
+      body: Column(
+        children: [
+          CustomTextField(controller: email, label: "Email"),
+          SizedBox(height: 10),
 
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await AuthService().login(email.text, pass.text);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => HomeScreen()),
-                  );
-                } catch (e) {
-                  Helpers.showSnack(context, e.toString());
-                }
-              },
-              child: Text("Login"),
-            ),
+          CustomTextField(controller: pass, label: "Password", isPass: true),
+          SizedBox(height: 20),
 
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => RegisterScreen()),
-                );
-              },
-              child: Text("Register"),
-            ),
-          ],
-        ),
+          CustomButton(
+            text: "Login",
+            onPressed: () async {
+              try {
+                await AuthService().login(email.text, pass.text);
+
+                final router =
+                    Router.of(context).routerDelegate as AppRouter;
+                router.goTo(AppRoutes.home);
+
+              } catch (e) {
+                Helpers.showSnack(context, e.toString());
+              }
+            },
+          ),
+
+          TextButton(
+            onPressed: () {
+              final router =
+                  Router.of(context).routerDelegate as AppRouter;
+              router.goTo(AppRoutes.register);
+            },
+            child: Text("Register"),
+          ),
+        ],
       ),
     );
   }

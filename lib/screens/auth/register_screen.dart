@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import '../../utils/helpers.dart';
 import '../../widgets/custom_textfield.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/app_scaffold.dart';
+import '../../routes/app_routes.dart';
 
 class RegisterScreen extends StatelessWidget {
   final name = TextEditingController();
@@ -10,33 +13,33 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Register")),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            CustomTextField(controller: name, label: "Name"),
-            CustomTextField(controller: email, label: "Email"),
-            CustomTextField(controller: pass, label: "Password", isPass: true),
+    return AppScaffold(
+      title: "Register",
+      body: Column(
+        children: [
+          CustomTextField(controller: name, label: "Name"),
+          SizedBox(height: 10),
 
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  await AuthService().register(
-                    name.text,
-                    email.text,
-                    pass.text,
-                  );
-                  Navigator.pop(context);
-                } catch (e) {
-                  Helpers.showSnack(context, e.toString());
-                }
-              },
-              child: Text("Register"),
-            ),
-          ],
-        ),
+          CustomTextField(controller: email, label: "Email"),
+          SizedBox(height: 10),
+
+          CustomTextField(controller: pass, label: "Password", isPass: true),
+          SizedBox(height: 20),
+
+          CustomButton(
+            text: "Register",
+            onPressed: () async {
+              try {
+                await AuthService().register(name.text, email.text, pass.text);
+
+                final router = Router.of(context).routerDelegate as AppRouter;
+                router.goTo(AppRoutes.login);
+              } catch (e) {
+                Helpers.showSnack(context, e.toString());
+              }
+            },
+          ),
+        ],
       ),
     );
   }
